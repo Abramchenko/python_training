@@ -1,1 +1,1 @@
-# python_training
+# Репозиторий для python_training
