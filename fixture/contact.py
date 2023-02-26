@@ -52,15 +52,14 @@ class ContactHelper():
 
     def delete_first_contact(self):
         wd = self.app.wd
-        #open_home_page
-        # как? а зачем?
+        wd.open_home_page(self)
         self.select_first_contact()
         # submit deletion
         self.accept_next_alert = True
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         #wd.assertRegexpMatches(self.close_alert_and_get_its_text(), r"^Delete 1 addresses[\s\S]$")
         wd.switch_to.alert.accept()
-        # open_home_page
+        wd.open_home_page(self)
 
     def select_first_contact(self):
         wd = self.app.wd
