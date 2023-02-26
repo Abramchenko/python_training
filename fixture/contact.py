@@ -15,7 +15,6 @@ class ContactHelper():
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
 
     def fill_contact_form(self, contact):
-        wd = self.app.wd
         self.change_field_value("firstname", contact.firsrtname)
         self.change_field_value("middlename", contact.middlename)
         self.change_field_value("lastname", contact.lastname)
@@ -52,14 +51,18 @@ class ContactHelper():
 
     def delete_first_contact(self):
         wd = self.app.wd
-        wd.open_home_page(self)
+        self.open_contacts_page()
         self.select_first_contact()
         # submit deletion
         self.accept_next_alert = True
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         #wd.assertRegexpMatches(self.close_alert_and_get_its_text(), r"^Delete 1 addresses[\s\S]$")
         wd.switch_to.alert.accept()
-        wd.open_home_page(self)
+        self.open_contacts_page()
+
+    def open_contacts_page(self):
+        wd = self.app.wd
+        wd.find_element_by_link_text("home").click()
 
     def select_first_contact(self):
         wd = self.app.wd
@@ -67,13 +70,16 @@ class ContactHelper():
 
     def update(self, new_contact_data):
         wd = self.app.wd
-        wd.find_element_by_link_text("home").click()
+        self.open_contacts_page()
         # select first contact to edit
         wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr[2]/td[8]/a/img").click()
         self.fill_contact_form(new_contact_data)
         # submit update
         wd.find_element_by_name("update").click()
-        wd.find_element_by_link_text("home").click()
+        self.open_contacts_page()
 
-
-
+    def count(self):
+        wd = self.app.wd
+        self.open_contacts_page()
+    #    return len (wd.find_elements_by_name("selected[]"))
+        return len(wd.find_elements_by_xpath("//table[@id='maintable']/tbody/tr[2]/td[8]/a/img"))
