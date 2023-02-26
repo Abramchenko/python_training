@@ -56,13 +56,14 @@ class ContactHelper():
         # submit deletion
         self.accept_next_alert = True
         wd.find_element_by_xpath("//input[@value='Delete']").click()
-        #wd.assertRegexpMatches(self.close_alert_and_get_its_text(), r"^Delete 1 addresses[\s\S]$")
         wd.switch_to.alert.accept()
         self.open_contacts_page()
 
     def open_contacts_page(self):
         wd = self.app.wd
-        wd.find_element_by_link_text("home").click()
+        if not (wd.current_url.endswith("/addressbook/") or (wd.current_url.endswith("/index.php"))):
+            wd.find_element_by_link_text("home").click()
+
 
     def select_first_contact(self):
         wd = self.app.wd
@@ -81,5 +82,4 @@ class ContactHelper():
     def count(self):
         wd = self.app.wd
         self.open_contacts_page()
-    #    return len (wd.find_elements_by_name("selected[]"))
         return len(wd.find_elements_by_xpath("//table[@id='maintable']/tbody/tr[2]/td[8]/a/img"))
