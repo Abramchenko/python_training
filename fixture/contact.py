@@ -1,3 +1,9 @@
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+from model.contact import Contact
+
 class ContactHelper():
     def __init__(self, app):
         self.app = app
@@ -15,7 +21,7 @@ class ContactHelper():
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
 
     def fill_contact_form(self, contact):
-        self.change_field_value("firstname", contact.firsrtname)
+        self.change_field_value("firstname", contact.firstname)
         self.change_field_value("middlename", contact.middlename)
         self.change_field_value("lastname", contact.lastname)
         self.change_field_value("nickname", contact.nickname)
@@ -46,7 +52,8 @@ class ContactHelper():
         wd = self.app.wd
         if text is not None:
             wd.find_element_by_name(field_name).click()
-            wd.find_element_by_name(field_name).clear()
+            if not(field_name in ("bday","bmonth", "aday", "amonth", "new_group")):
+                wd.find_element_by_name(field_name).clear()
             wd.find_element_by_name(field_name).send_keys(text)
 
     def delete_first_contact(self):
@@ -58,6 +65,7 @@ class ContactHelper():
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         wd.switch_to.alert.accept()
         self.open_contacts_page()
+        WebDriverWait (wd, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.msgbox")))
 
     def open_contacts_page(self):
         wd = self.app.wd
@@ -83,3 +91,14 @@ class ContactHelper():
         wd = self.app.wd
         self.open_contacts_page()
         return len(wd.find_elements_by_xpath("//table[@id='maintable']/tbody/tr[2]/td[8]/a/img"))
+
+    def get_contact_list(self):
+        wd = self.app.wd
+        self.open_contacts_page()
+        contacts = []
+        for element in wd.find_elements_by_name("entry"):
+            firstname_text = element.find_element_by_xpath("td[2]").text
+            lastname_text = element.find_element_by_xpath("td[3]").text
+            id = element.find_element_by_name("selected[]").get_attribute("value")
+            contacts.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text))
+        return contacts
