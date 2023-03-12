@@ -8,6 +8,8 @@ class ContactHelper():
     def __init__(self, app):
         self.app = app
 
+    contact_cache = None
+
     def open_addnew_page(self):
         wd = self.app.wd
         wd.find_element_by_link_text("add new").click()
@@ -19,6 +21,7 @@ class ContactHelper():
         self.fill_contact_form(contact)
         # enter_contact(self, wd):
         wd.find_element_by_xpath("//div[@id='content']/form/input[21]").click()
+        self.contact_cache = None
 
     def fill_contact_form(self, contact):
         self.change_field_value("firstname", contact.firstname)
@@ -64,8 +67,9 @@ class ContactHelper():
         self.accept_next_alert = True
         wd.find_element_by_xpath("//input[@value='Delete']").click()
         wd.switch_to.alert.accept()
+        WebDriverWait(wd, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.msgbox")))
         self.open_contacts_page()
-        WebDriverWait (wd, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.msgbox")))
+        self.contact_cache = None
 
     def open_contacts_page(self):
         wd = self.app.wd
@@ -86,19 +90,22 @@ class ContactHelper():
         # submit update
         wd.find_element_by_name("update").click()
         self.open_contacts_page()
+        self.contact_cache = None
 
     def count(self):
         wd = self.app.wd
         self.open_contacts_page()
-        return len(wd.find_elements_by_xpath("//table[@id='maintable']/tbody/tr[2]/td[8]/a/img"))
+        return len(wd.find_elements_by_name("selected[]"))
 
     def get_contact_list(self):
-        wd = self.app.wd
-        self.open_contacts_page()
-        contacts = []
-        for element in wd.find_elements_by_name("entry"):
-            firstname_text = element.find_element_by_xpath("td[3]").text
-            lastname_text = element.find_element_by_xpath("td[2]").text
-            id = element.find_element_by_name("selected[]").get_attribute("value")
-            contacts.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text))
-        return contacts
+        # собираем список в том случае, если в кэше его нет
+        if self.contact_cache is None:
+            wd = self.app.wd
+            self.open_contacts_page()
+            self.contact_cache  = []
+            for element in wd.find_elements_by_name("entry"):
+                firstname_text = element.find_element_by_xpath("td[3]").text
+                lastname_text = element.find_element_by_xpath("td[2]").text
+                id = element.find_element_by_name("selected[]").get_attribute("value")
+                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text))
+        return list(self.contact_cache)   #это копия списка
