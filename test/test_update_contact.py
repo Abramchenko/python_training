@@ -1,3 +1,5 @@
+from random import randrange
+
 from model.contact import Contact
 
 def test_update_contact(app):
@@ -6,10 +8,11 @@ def test_update_contact(app):
         app.contact.create(Contact(firstname="Ivan", lastname="Petrovich", nickname="Alex", title=" some title",
                                    company="IT one"))
     old_contacts = app.contact.get_contact_list()
-    contact =Contact(firstname="IVAN",  lastname="Updated 2", nickname="Nick", title=" some new title",
+    index = randrange(len(old_contacts))
+    contact =Contact(firstname="IVAN",  lastname="Updated 3", nickname="Nick", title=" some new title",
                                company="IT LUX")
-    contact.id = old_contacts[0].id
-    app.contact.update(contact)
+    contact.id = old_contacts[index].id
+    app.contact.update_contact_by_index(index, contact)
     # сначала сравним списки по длине, не загружая список лишний раз
     assert len(old_contacts) == app.contact.count()
     new_contacts = app.contact.get_contact_list()
