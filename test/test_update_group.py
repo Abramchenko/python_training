@@ -12,6 +12,6 @@ def test_update_some_group(app):
     # сначала сравним списки по длине, не загружая список групп лишний раз
     assert len(old_groups) == app.group.count()
     new_groups = app.group.get_group_list()
-    # сравнение списков по содержанию, old - это список до обновления, поэтому добавим в его начало такой же элемент
-    old_groups[0] = group
+    # сравнение списков по содержанию, old - это список до обновления, поэтому заменим в нем соотв. элемент
+    old_groups[index] = group
     assert sorted(old_groups, key=Group.id_or_max) == sorted(new_groups, key=Group.id_or_max)

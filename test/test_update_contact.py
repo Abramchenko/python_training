@@ -16,6 +16,6 @@ def test_update_contact(app):
     # сначала сравним списки по длине, не загружая список лишний раз
     assert len(old_contacts) == app.contact.count()
     new_contacts = app.contact.get_contact_list()
-    # сравнение списков по содержанию, в старый список добавим такой же элемент в начало
-    old_contacts [0] = contact
+    # сравнение списков по содержанию, в старом списке  заменим соотв. элемент
+    old_contacts [index] = contact
     assert sorted(old_contacts, key=Contact.id_or_max) == sorted(new_contacts, key=Contact.id_or_max)

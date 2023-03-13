@@ -95,9 +95,7 @@ class ContactHelper():
         wd = self.app.wd
         self.open_contacts_page()
         # select contact to edit
-
         wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr["+str(index+2)+"]/td[8]/a/img").click()
-       # wd.find_elements_by_link_text("Edit")[index].click()
         self.fill_contact_form(new_contact_data)
         # submit update
         wd.find_element_by_name("update").click()
