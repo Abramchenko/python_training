@@ -1,7 +1,7 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-
+import re
 from model.contact import Contact
 
 class ContactHelper():
@@ -93,14 +93,18 @@ class ContactHelper():
 
     def update_contact_by_index(self, index, new_contact_data):
         wd = self.app.wd
-        self.open_contacts_page()
         # select contact to edit
-        wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr["+str(index+2)+"]/td[8]/a/img").click()
+        self.open_contact_to_edit_by_index(index)
         self.fill_contact_form(new_contact_data)
         # submit update
         wd.find_element_by_name("update").click()
         self.open_contacts_page()
         self.contact_cache = None
+
+    def open_contact_to_edit_by_index(self, index):
+        wd = self.app.wd
+        self.open_contacts_page()
+        wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr[" + str(index + 2) + "]/td[8]/a/img").click()
 
     def count(self):
         wd = self.app.wd
@@ -113,9 +117,49 @@ class ContactHelper():
             wd = self.app.wd
             self.open_contacts_page()
             self.contact_cache  = []
-            for element in wd.find_elements_by_name("entry"):
-                firstname_text = element.find_element_by_xpath("td[3]").text
-                lastname_text = element.find_element_by_xpath("td[2]").text
-                id = element.find_element_by_name("selected[]").get_attribute("value")
-                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text))
+            for row in wd.find_elements_by_name("entry"):
+                cells = row.find_elements_by_tag_name("td")
+                lastname_text = row.find_element_by_xpath("td[2]").text
+                firstname_text = row.find_element_by_xpath("td[3]").text
+                id = row.find_element_by_name("selected[]").get_attribute("value")
+                # или id = row.find_element_by_tag_name("input").get_attribute("value")
+                all_phones = cells[5].text.splitlines()
+                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
+                                            home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
+                                            #fax =all_phones[3]
         return list(self.contact_cache)   #это копия списка
+
+
+    def get_contact_from_edit_page(self, index):
+        wd = self.app.wd
+        self.open_contact_to_edit_by_index(index)
+        lastname_text = wd.find_element_by_name("lastname").get_attribute("value")
+        firstname_text = wd.find_element_by_name("firstname").get_attribute("value")
+        id = wd.find_element_by_name("id").get_attribute("value")
+        home = wd.find_element_by_name("home").get_attribute("value")
+        mobile = wd.find_element_by_name("mobile").get_attribute("value")
+        work = wd.find_element_by_name("work").get_attribute("value")
+        #fax = wd.find_element_by_name("fax").get_attribute("value")
+        return Contact(id=id, firstname=firstname_text, lastname=lastname_text,
+                        home=home, mobile=mobile, work= work)
+
+
+
+    def open_contact_view_by_index(self, index):
+        wd = self.app.wd
+        self.open_contacts_page()
+        wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr[" + str(index + 2) + "]/td[7]/a/img").click()
+
+    def get_contact_from_view_page(self, index):
+        wd = self.app.wd
+        self.open_contact_view_by_index(index)
+        # телефоны собраны в одом объекте с новой строки
+        text = wd.find_element_by_id ("content").text
+        # ищем строку после символов Н:
+        home = re.search("H:(.*)", text).group(1)
+        mobile = re.search("M:(.*)", text).group(1)
+        work = re.search("W:(.*)", text).group(1)
+        lastname_text = wd.find_element(By.XPATH, "/html/body/div/div[4]/b").get_attribute("value")
+
+        # fax = re.search("F:(.*)", text).group(1)
+        return (Contact(lastname=lastname_text,home=home, mobile=mobile, work=work))
