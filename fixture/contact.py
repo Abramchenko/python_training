@@ -123,10 +123,15 @@ class ContactHelper():
                 firstname_text = row.find_element_by_xpath("td[3]").text
                 id = row.find_element_by_name("selected[]").get_attribute("value")
                 # или id = row.find_element_by_tag_name("input").get_attribute("value")
-                all_phones = cells[5].text.splitlines()
-                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
-                                            home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
+                # телефоны по отдельности
+                #all_phones = cells[5].text.splitlines()
+                #self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
+                 #                           home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
                                             #fax =all_phones[3]
+                #телефоны вместе
+                all_phones_as_one = cells[5].text
+                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
+                                          all_phones_as_one=all_phones_as_one ))
         return list(self.contact_cache)   #это копия списка
 
 
@@ -163,3 +168,6 @@ class ContactHelper():
 
         # fax = re.search("F:(.*)", text).group(1)
         return (Contact(lastname=lastname_text,home=home, mobile=mobile, work=work))
+
+
+
