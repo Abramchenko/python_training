@@ -118,35 +118,41 @@ class ContactHelper():
             self.open_contacts_page()
             self.contact_cache  = []
             for row in wd.find_elements_by_name("entry"):
+                id = row.find_element_by_name("selected[]").get_attribute("value")
                 cells = row.find_elements_by_tag_name("td")
                 lastname_text = row.find_element_by_xpath("td[2]").text
                 firstname_text = row.find_element_by_xpath("td[3]").text
-                id = row.find_element_by_name("selected[]").get_attribute("value")
+                address = cells[3].text
                 # или id = row.find_element_by_tag_name("input").get_attribute("value")
                 # телефоны по отдельности
                 #all_phones = cells[5].text.splitlines()
                 #self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
                  #                           home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
                                             #fax =all_phones[3]
-                #телефоны вместе
-                all_phones_as_one = cells[5].text
-                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
-                                          all_phones_as_one=all_phones_as_one ))
+                # email, телефоны вместе
+                all_emails = cells[4].text
+                all_phones = cells[5].text
+                self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text, address=address,
+                                          all_phones=all_phones, all_emails=all_emails ))
         return list(self.contact_cache)   #это копия списка
 
 
     def get_contact_from_edit_page(self, index):
         wd = self.app.wd
         self.open_contact_to_edit_by_index(index)
+        id = wd.find_element_by_name("id").get_attribute("value")
         lastname_text = wd.find_element_by_name("lastname").get_attribute("value")
         firstname_text = wd.find_element_by_name("firstname").get_attribute("value")
-        id = wd.find_element_by_name("id").get_attribute("value")
+        address = wd.find_element_by_name("address").get_attribute("value")
         home = wd.find_element_by_name("home").get_attribute("value")
         mobile = wd.find_element_by_name("mobile").get_attribute("value")
         work = wd.find_element_by_name("work").get_attribute("value")
+        email =wd.find_element_by_name("email").get_attribute("value")
+        email2 =wd.find_element_by_name("email2").get_attribute("value")
+        email3 =wd.find_element_by_name("email3").get_attribute("value")
         #fax = wd.find_element_by_name("fax").get_attribute("value")
-        return Contact(id=id, firstname=firstname_text, lastname=lastname_text,
-                        home=home, mobile=mobile, work= work)
+        return Contact(id=id, firstname=firstname_text, lastname=lastname_text, address = address,
+                        home=home, mobile=mobile, work= work, email=email, email2=email2, email3=email3)
 
 
 
