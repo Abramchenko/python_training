@@ -9,10 +9,10 @@ class Application:
         self.base_url = base_url
         if browser == "firefox":
             self.wd = webdriver.Firefox()
-        elif browser == "chrom":
-            self.wd = webdriver.Chrom()
-        elif browser == "ie":
-            self.wd = webdriver.Ie()
+        elif browser == "chrome":
+            self.wd = webdriver.Chrome()
+        elif browser == "edge":
+            self.wd = webdriver.Edge()
         else:
             raise ValueError("Неизвестный браузер %s" %browser)
         self.wd.implicitly_wait(2)

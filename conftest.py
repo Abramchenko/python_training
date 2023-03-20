@@ -1,6 +1,6 @@
 import pytest
 from fixture.application import Application
-
+#perem =None
 fixture = None
 @pytest.fixture
 #(scope="session") фикстура в процессе выполнения тестов может закрыться (внепланово), поэтому лучше создавать ее не однажды на всю сессию,
