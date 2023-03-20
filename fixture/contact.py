@@ -171,7 +171,6 @@ class ContactHelper():
         mobile = re.search("M:(.*)", text).group(1)
         work = re.search("W:(.*)", text).group(1)
         lastname_text = wd.find_element(By.XPATH, "/html/body/div/div[4]/b").get_attribute("value")
-
         # fax = re.search("F:(.*)", text).group(1)
         return (Contact(lastname=lastname_text,home=home, mobile=mobile, work=work))
 
