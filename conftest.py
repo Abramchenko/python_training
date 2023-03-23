@@ -1,7 +1,12 @@
+import importlib
+
+import jsonpickle
+
 from fixture.application import Application
 import pytest
 import json
 import os.path
+
 
 
 fixture = None
@@ -37,3 +42,24 @@ def pytest_addoption(parser):
     parser.addoption("--browser", action="store", default="firefox")
     parser.addoption("--target", action="store", default="target.json")
 #"http://localhost/addressbook/")
+
+
+# динамическое связывание тестовых данных с тестами через фикстуру
+def pytest_generate_tests(metafunc):
+    # пробегаем по всем параметрам metafunc
+    # через нее можно получить инф о тестовой функции, напр, о фикстуре (параметр этой функции)
+    for fixture in metafunc.fixturenames:
+        if fixture.startswith("data_"):
+            testdata = load_from_modul(fixture[5:])
+            metafunc.parametrize(fixture, testdata, ids=[str(x) for x in testdata])  # отобразить строками
+        elif fixture.startswith("json_"):
+            testdata = load_from_json(fixture[5:])
+            metafunc.parametrize(fixture, testdata, ids=[str(x) for x in testdata])  # отобразить строками
+
+
+def load_from_modul(module):
+    return importlib.import_module("data.%s" %module).testdata
+
+def load_from_json(file):
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data\\%s.json" %file)) as f:
+        return jsonpickle.decode(f.read())
