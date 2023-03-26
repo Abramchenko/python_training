@@ -74,6 +74,17 @@ class ContactHelper():
         self.open_contacts_page()
         self.contact_cache = None
 
+    def delete_contact_by_id(self, id):
+        wd = self.app.wd
+        self.open_contacts_page()
+        self.select_contact_by_id(id)
+        # submit deletion
+        self.accept_next_alert = True
+        wd.find_element_by_xpath("//input[@value='Delete']").click()
+        wd.switch_to.alert.accept()
+        WebDriverWait(wd, 5).until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.msgbox")))
+        self.open_contacts_page()
+        self.contact_cache = None
     def open_contacts_page(self):
         wd = self.app.wd
         if not (wd.current_url.endswith("/addressbook/") or (wd.current_url.endswith("/index.php"))):
@@ -88,6 +99,10 @@ class ContactHelper():
         wd = self.app.wd
         wd.find_elements_by_name("selected[]")[index].click()
 
+    def select_contact_by_id(self, id):
+        wd = self.app.wd
+        wd.find_element_by_css_selector("input[value='%s']" % id).click()
+
     def update_first_contact(self, new_contact_data):
         self.update_contact_by_index(0, new_contact_data)
 
@@ -101,10 +116,26 @@ class ContactHelper():
         self.open_contacts_page()
         self.contact_cache = None
 
+    def update_contact_by_id(self, id, new_contact_data):
+        wd = self.app.wd
+        # select contact to edit
+        self.open_contact_to_edit_by_id(id)
+        self.fill_contact_form(new_contact_data)
+        # submit update
+        wd.find_element_by_name("update").click()
+        self.open_contacts_page()
+        self.contact_cache = None
+
     def open_contact_to_edit_by_index(self, index):
         wd = self.app.wd
         self.open_contacts_page()
         wd.find_element_by_xpath("//table[@id='maintable']/tbody/tr[" + str(index + 2) + "]/td[8]/a/img").click()
+
+    def open_contact_to_edit_by_id(self, id):
+        wd = self.app.wd
+        self.open_contacts_page()
+        wd.find_element_by_css_selector("a[href='edit.php?id=%s']" %str(id)).click()
+
 
     def count(self):
         wd = self.app.wd
@@ -121,7 +152,11 @@ class ContactHelper():
                 id = row.find_element_by_name("selected[]").get_attribute("value")
                 cells = row.find_elements_by_tag_name("td")
                 lastname_text = row.find_element_by_xpath("td[2]").text
+                if lastname_text is None:
+                    lastname_text =""
                 firstname_text = row.find_element_by_xpath("td[3]").text
+                if firstname_text is None:
+                    firstname_text =""
                 address = cells[3].text
                 # или id = row.find_element_by_tag_name("input").get_attribute("value")
                 # телефоны по отдельности
