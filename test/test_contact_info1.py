@@ -2,7 +2,6 @@ import re
 from random import randrange
 from model.contact import Contact
 
-
 def test_contact_info_on_homepage(app):
     if app.contact.count() == 0:
         app.contact.create(Contact(firstname="Ivan", lastname="Petrovich", nickname="Alex", title=" some title", company="IT one",
@@ -17,14 +16,10 @@ def test_contact_info_on_homepage(app):
     assert contact_from_home_page.address == contact_from_edit_page.address
     assert contact_from_home_page.all_emails == merge_emails_like_on_homepage(contact_from_edit_page)
     assert contact_from_home_page.all_phones == merge_phones_like_on_homepage(contact_from_edit_page)
-
     #assert contact_from_home_page.home == clear (contact_from_edit_page.home)
-
-
 
 def clear(s):
     return re.sub("[() -]", "", s)
-
 
 def merge_phones_like_on_homepage(contact):
     return "\n".join(
@@ -32,12 +27,10 @@ def merge_phones_like_on_homepage(contact):
         map(lambda x: clear(x),                   # применить clear ко всем телефонам по отдельности
         filter(lambda x: x is not None, [contact.home, contact.mobile,contact.work])))) # отобрать только не None телефоны
 
-
 def merge_emails_like_on_homepage(contact):
     return "\n".join(
         filter(lambda x: x!="",      # избавиться от пустых строк (в конце добавился \n)
-        map(lambda x: clear(x),                   # применить clear ко всем телефонам по отдельности
-        filter(lambda x: x is not None, [contact.email, contact.email2,contact.email3])))) # отобрать только не None телефоны
+            filter(lambda x: x is not None, [contact.email.strip(), contact.email2.strip(),contact.email3.strip()]))) # отобрать только не None email
 
 '''
 def test_phone_on_contactview_page(app):
