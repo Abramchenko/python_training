@@ -1,7 +1,7 @@
 import pymysql.cursors
 from model.group import Group
 from model.contact import Contact
-
+#
 class DBFixture:
     def __init__(self, host, name, user, password):
         self.host = host

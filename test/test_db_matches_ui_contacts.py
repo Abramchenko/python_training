@@ -1,5 +1,5 @@
 from model.contact import Contact
-
+#
 # Внутренний тест, что загрузка из БД одинаковая с web
 # В БД инфо более точная, с пробелами в name, их приходится очищать
 def test_contact_list(app, db):    #две фикстуры
