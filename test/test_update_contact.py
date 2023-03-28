@@ -17,4 +17,4 @@ def test_update_contact(app, db, check_ui):
     old_contacts [index] = contact
     assert old_contacts == new_contacts
     if check_ui:
-        assert sorted(new_contacts, key=Contact.id_or_max)==sorted(app.group.get_group_list(), key=Contact.id_or_max)
+        assert sorted(new_contacts, key=Contact.id_or_max)==sorted(app.group.get_contact_list(), key=Contact.id_or_max)
