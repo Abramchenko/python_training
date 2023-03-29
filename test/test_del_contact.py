@@ -14,5 +14,6 @@ def test_delete_some_contact(app, db,check_ui):
     # сравнение списков по содержанию, в старом списке удалим выбранный элемент
     old_contacts.remove(contact)
     assert old_contacts == new_contacts
+    # сравнение списка из БД и из web
     if check_ui:
-        assert sorted(new_contacts, key=Contact.id_or_max)==sorted(app.group.get_contact_list(), key=Contact.id_or_max)
+        assert sorted(new_contacts, key=Contact.id_or_max)==sorted(app.contact.get_contact_list(), key=Contact.id_or_max)

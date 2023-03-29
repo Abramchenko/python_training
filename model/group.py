@@ -1,6 +1,8 @@
 from sys import maxsize
+import re
 
-
+def clear(s):
+    return re.sub(" {2}", " ", s)
 class Group:
 
     def __init__(self, name=None, header=None, footer=None, id = None):
@@ -13,7 +15,7 @@ class Group:
         return "%s;%s; %s; %s" % (self.id, self.name, self.header, self.footer)
 
     def __eq__(self, other):
-        return (self.id is None or other.id is None or self.id == other.id) and self.name == other.name
+        return (self.id is None or other.id is None or self.id == other.id) and clear(self.name.strip()) == clear(other.name.strip())
 
     def id_or_max(self):
         if self.id:
