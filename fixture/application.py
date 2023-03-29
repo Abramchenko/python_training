@@ -5,7 +5,7 @@ from fixture.contact import ContactHelper
 from selenium import webdriver
 
 class Application:
-    def __init__(self, browser="firefox", base_url="https://localhost/addressbook/"):
+    def __init__(self, browser, base_url):
         if browser == "firefox":
             self.wd = webdriver.Firefox()
         elif browser == "chrome":
@@ -31,7 +31,6 @@ class Application:
     def open_home_page(self):
         wd = self.wd
         wd.get(self.base_url)
-        #wd.get("https://localhost/addressbook/")
 
     def destroy(self):
         self.wd.quit()
