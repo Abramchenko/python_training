@@ -2,7 +2,7 @@ from sys import maxsize
 import re
 
 
-def clear(s):
+def clear_spaces(s):
     return re.sub(" {2}", " ", s)
 class Contact:
 
@@ -44,7 +44,7 @@ class Contact:
 
 
     def __eq__(self, other):
-        return (self.id is None or other.id is None or self.id == other.id) and (clear(self.lastname.strip()) == clear(other.lastname.strip()) and clear(self.firstname.strip()) == clear(other.firstname.strip()))
+        return (self.id is None or other.id is None or self.id == other.id) and (clear_spaces(self.lastname.strip()) == clear_spaces(other.lastname.strip()) and clear_spaces(self.firstname.strip()) == clear_spaces(other.firstname.strip()))
 
     def id_or_max(self):
         if self.id:

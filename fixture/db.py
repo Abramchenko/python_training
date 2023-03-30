@@ -17,7 +17,8 @@ class DBFixture:
         list =[]
         cursor = self.connection.cursor()
         try:
-            cursor.execute("select group_id, group_name, group_header, group_footer from group_list")
+            cursor.execute(
+                "select group_id, group_name, group_header, group_footer from group_list where deprecated='0000-00-00 00:00:00'")
             for row in cursor:
                 (id, name, header, footer) = row
                 list.append(Group(id=str(id), name=name, header=header, footer=footer))
@@ -29,10 +30,11 @@ class DBFixture:
         list =[]
         cursor = self.connection.cursor()
         try:
-            cursor.execute("select id, lastname, firstname, address, home, mobile from addressbook")
+            cursor.execute("select id, lastname, firstname, address, home, mobile, work, email, email2, email3 from addressbook where deprecated='0000-00-00 00:00:00'")
             for row in cursor:
-                (id, lastname, firstname, address, home, mobile) = row
-                list.append(Contact(id=str(id), lastname=lastname, firstname=firstname, address=address, home=home, mobile=mobile))
+                (id, lastname, firstname, address, home, mobile, work, email, email2, email3) = row
+                list.append(Contact(id=str(id), lastname=lastname, firstname=firstname, address=address, home=home, mobile=mobile,
+                                    work=work, email=email, email2=email2, email3=email3))
         finally:
             cursor.close()
         return list
