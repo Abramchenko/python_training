@@ -1,12 +1,18 @@
+from random import randrange
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import re
 from model.contact import Contact
-#
+#from fixture.orm import ORMFixture
+
+#db = ORMFixture(host="127.0.0.1", name="addressbook", user="root", password="")
+
+
 class ContactHelper():
-    def __init__(self, app):
+    def __init__(self, app, orm):
         self.app = app
+        self.orm = orm
 
     contact_cache = None
 
@@ -57,7 +63,11 @@ class ContactHelper():
             wd.find_element_by_name(field_name).click()
             if not(field_name in ("bday","bmonth", "aday", "amonth", "new_group")):
                 wd.find_element_by_name(field_name).clear()
-            wd.find_element_by_name(field_name).send_keys(text)
+            if (field_name == "new_group"):
+                index = randrange(len(self.orm.get_group_list()))
+                wd.find_element_by_xpath("//html/body/div/div[4]/form/select[5]/option[" + str(index) + "]").click()
+            else:
+                wd.find_element_by_name(field_name).send_keys(text)
 
     def delete_first_contact(self, index):
         self.delete_contact_by_index(0)
@@ -162,13 +172,13 @@ class ContactHelper():
                 # телефоны по отдельности
                 #all_phones = cells[5].text.splitlines()
                 #self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text,
-                 #                           home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
+                 #                         home=all_phones[0], mobile=all_phones[1], work= all_phones[2] ))
                                             #fax =all_phones[3]
                 # email, телефоны вместе
                 all_emails = cells[4].text
                 all_phones = cells[5].text
                 self.contact_cache.append(Contact(id=id, firstname=firstname_text, lastname=lastname_text, address=address,
-                                          all_phones=all_phones, all_emails=all_emails ))
+                                         all_phones=all_phones, all_emails=all_emails))
         return list(self.contact_cache)   #это копия списка
 
 

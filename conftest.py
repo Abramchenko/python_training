@@ -2,6 +2,7 @@ import importlib
 import jsonpickle
 from fixture.application import Application
 from fixture.db import DBFixture
+from fixture.orm import ORMFixture
 import pytest
 import json
 import os.path
@@ -20,6 +21,11 @@ def  load_config(file):
 @pytest.fixture (scope="session")
 def check_ui(request):
     return request.config.getoption("--check_ui")
+
+@pytest.fixture (scope="session")
+def orm():
+    ormfixture = ORMFixture(host="127.0.0.1", name="addressbook", user="root", password="")
+    return ormfixture
 
 @pytest.fixture (scope="session")
 def db(request):

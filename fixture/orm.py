@@ -1,7 +1,9 @@
 from pony.orm import *
 from model.group import Group
 from model.contact import Contact
-from pymysql.converters import decoders
+from fixture.group import GroupHelper
+from fixture.contact import ContactHelper
+#from pymysql.converters import decoders
 from datetime import datetime
 
 class ORMFixture:
@@ -22,10 +24,17 @@ class ORMFixture:
         deprecated = Optional(str, column="deprecated")
         groups = Set(lambda: ORMFixture.ORMGroup, table = "address_in_groups", column="group_id", reverse="contacts", lazy=True)
 
+    #def __init__(self, host="127.0.0.1", name="addressbook", user="root", password=""):
     def __init__(self, host, name, user, password):
-        self.db.bind("mysql", host=host, database=name, user=user, password=password, conv=decoders) #правильно преобразует дату
+        self.host = host
+        self.name = name
+        self.user = user
+        self.password = password
+        self.db.bind("mysql", host=host, database=name, user=user, password=password)
         # сопоставление свойств классов и полей таблиц
         self.db.generate_mapping()
+        self.group = GroupHelper(self)
+        self.contact = ContactHelper(self)
 
     def convert_groups_to_model(self, groups):
         def convert(group):
@@ -51,3 +60,8 @@ class ORMFixture:
         orm_group = list(select(g for g in ORMFixture.ORMGroup if g.id == group.id))[0]
         return self.convert_contacts_to_model(orm_group.contacts)
 
+    @db_session
+    def get_contacts_not_in_group(self, group):
+        orm_group = list(select(g for g in ORMFixture.ORMGroup if g.id == group.id))[0]
+        return self.convert_contacts_to_model(select(c for c in ORMFixture.ORMContact
+                                                     if c.deprecated is None and orm_group not in c.groups))
