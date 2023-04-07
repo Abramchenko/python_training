@@ -4,15 +4,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import re
 from model.contact import Contact
-#from fixture.orm import ORMFixture
-
-#db = ORMFixture(host="127.0.0.1", name="addressbook", user="root", password="")
 
 
 class ContactHelper():
-    def __init__(self, app, orm):
+    def __init__(self, app):
         self.app = app
-        self.orm = orm
 
     contact_cache = None
 
@@ -20,6 +16,28 @@ class ContactHelper():
         wd = self.app.wd
         wd.find_element_by_link_text("add new").click()
 
+    def add_contact_to_group(self, id, group_name):
+        wd = self.app.wd
+        self.open_contacts_page()
+        self.select_contact_by_id(id)
+        wd.find_element_by_name("to_group").send_keys(group_name)
+        wd.find_element_by_name("add").click()
+        self.contact_cache = None
+
+    def remove_contact_from_group(self, id, group):
+        wd = self.app.wd
+        self.open_contacts_page()
+        #print(id, group.id, group.name)
+        text = group.name
+        #wd.find_element_by_name("group").click()
+        #wd.find_element_by_name("group").send_keys("[none]")
+        wd.find_element_by_name("group").click()
+        wd.find_element_by_name("group").send_keys(text)
+        self.select_contact_by_id(id)
+        #wd.find_element_by_css_selector("input[name='remove']").click()
+        wd.find_element_by_name("remove").click()
+        self.contact_cache = None
+        #wd.find_element_by_css_selector("a[href='./?group=%s']" % group_name).click()
 
     def create(self, contact):
         wd = self.app.wd
@@ -63,11 +81,7 @@ class ContactHelper():
             wd.find_element_by_name(field_name).click()
             if not(field_name in ("bday","bmonth", "aday", "amonth", "new_group")):
                 wd.find_element_by_name(field_name).clear()
-            if (field_name == "new_group"):
-                index = randrange(len(self.orm.get_group_list()))
-                wd.find_element_by_xpath("//html/body/div/div[4]/form/select[5]/option[" + str(index) + "]").click()
-            else:
-                wd.find_element_by_name(field_name).send_keys(text)
+            wd.find_element_by_name(field_name).send_keys(text)
 
     def delete_first_contact(self, index):
         self.delete_contact_by_index(0)
@@ -111,7 +125,7 @@ class ContactHelper():
 
     def select_contact_by_id(self, id):
         wd = self.app.wd
-        wd.find_element_by_css_selector("input[value='%s']" % id).click()
+        wd.find_element_by_css_selector("input[value='%s']" %id).click()
 
     def update_first_contact(self, new_contact_data):
         self.update_contact_by_index(0, new_contact_data)
