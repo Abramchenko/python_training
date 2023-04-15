@@ -16,28 +16,24 @@ class ContactHelper():
         wd = self.app.wd
         wd.find_element_by_link_text("add new").click()
 
-    def add_contact_to_group(self, id, group_name):
+    def add_contact_to_group(self, contact, group):
         wd = self.app.wd
         self.open_contacts_page()
-        self.select_contact_by_id(id)
-        wd.find_element_by_name("to_group").send_keys(group_name)
+        self.select_contact_by_id(contact.id)
+        wd.find_element_by_name("to_group").send_keys(group.name)
         wd.find_element_by_name("add").click()
         self.contact_cache = None
 
-    def remove_contact_from_group(self, id, group):
+    def remove_contact_from_group(self, contact, group):
         wd = self.app.wd
         self.open_contacts_page()
-        #print(id, group.id, group.name)
-        text = group.name
-        #wd.find_element_by_name("group").click()
-        #wd.find_element_by_name("group").send_keys("[none]")
-        wd.find_element_by_name("group").click()
-        wd.find_element_by_name("group").send_keys(text)
-        self.select_contact_by_id(id)
-        #wd.find_element_by_css_selector("input[name='remove']").click()
-        wd.find_element_by_name("remove").click()
+        wd.find_element(By.TAG_NAME, "select").click()
+        wd.find_element(By.CSS_SELECTOR, "[value='%s']" % group.id).click()
+        self.select_contact_by_id(contact.id)
+        wd.find_element_by_css_selector("input[name='remove']").click()
         self.contact_cache = None
-        #wd.find_element_by_css_selector("a[href='./?group=%s']" % group_name).click()
+        wd.find_element_by_link_text('group page "%s"' % group.name).click()
+
 
     def create(self, contact):
         wd = self.app.wd
