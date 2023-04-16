@@ -21,7 +21,7 @@ def test_del_contact_from_group(app, db, orm, check_ui):
             not_in_group = orm.get_contacts_not_in_group(group)
 
         contact = random.choice(not_in_group)
-        app.contact.add_contact_to_group(contact.id, group.name)
+        app.contact.add_contact_to_group(contact, group)
 
     old_contacts_in_group = orm.get_contacts_in_group(group)
 
