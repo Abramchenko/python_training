@@ -12,7 +12,7 @@ def test_add_contact_to_group(app, orm):
 
     contact = Contact(firstname="Ivan", lastname="Petrovich", nickname="Alex", title=" some title",
                                company="IT one")
-    if (len(orm.get_contact_list())==0) or (len(orm.get_contacts_not_in_group)) == 0:
+    if (len(orm.get_contact_list())==0) or (len(orm.get_contacts_not_in_group(group)) == 0):
         app.contact.create(contact)
     not_in_group = orm.get_contacts_not_in_group(group)
     contact = random.choice(not_in_group)
